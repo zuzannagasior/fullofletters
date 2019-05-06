@@ -1,26 +1,70 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz ,.";
+
+class ChangingLetters extends React.Component {
+    
+  state= {
+      changingLetters: [],
+      paused: false
+  }
+
+
+  changeLetters = () => {
+      var newLetters = [];
+      for (var i = 0; i < 640; i++) { 
+          const newLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+          newLetters.push(newLetter);
+      }
+
+  this.setState({
+      changingLetters: [...newLetters]
+  })
+  }
+
+
+  componentDidMount() {
+      this.idI = setInterval(this.changeLetters, 50)
+  }
+
+  componentWillUnmount() {
+      clearInterval(this.idI)
+  }
+
+  componentDidUpdate() {
+      document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown = (e) => {
+      if(e.keyCode === 32 && !this.state.paused) {
+          clearInterval(this.idI)
+          this.setState({
+              paused: true
+          })
+      }else if (e.keyCode === 32 && this.state.paused) {
+          this.idI = setInterval(this.changeLetters, 50)
+          this.setState({
+              paused: false
+          })
+      }
+  }
+
+  
+  render() {
+        var index = 0;
+        const showLetters = this.state.changingLetters.map(letter => {
+          index++;
+          return <div key={index} className="letters">{letter.toUpperCase()}</div>
+         })
+
+      return (
+          <div onKeyUp={this.handleKeyUp} className="container">
+            {showLetters}
+          </div>
+      )
+  }
 }
 
-export default App;
+export default ChangingLetters;
